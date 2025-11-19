@@ -1,0 +1,127 @@
+<ion-content [fullscreen]>
+  <div class="page-wrapper">
+    <ion-grid>
+      <ion-row>
+
+        <!-- FORMULARIO -->
+        <ion-col size="12" size-md="6">
+          <div class="card fade-in">
+            <h3 class="card-title">Agregar proceso</h3>
+
+            <ion-item class="styled-item">
+              <ion-label position="stacked">Nombre</ion-label>
+              <ion-input [(ngModel)]="newName"></ion-input>
+            </ion-item>
+
+            <ion-item class="styled-item">
+              <ion-label position="stacked">Tiempo de ejecución</ion-label>
+              <ion-input type="number" [(ngModel)]="newBurst"></ion-input>
+            </ion-item>
+
+            <ion-item class="styled-item">
+              <ion-label position="stacked">Prioridad</ion-label>
+              <ion-input type="number" [(ngModel)]="newPriority"></ion-input>
+            </ion-item>
+
+            <div class="button-row">
+              <ion-button expand="block" color="success" (click)="addOrSave()" class="btn-animate">
+                {{ editingIndex === null ? 'Agregar' : 'Guardar' }}
+              </ion-button>
+
+              <ion-button expand="block" color="medium" (click)="clearAll()" class="btn-animate">
+                Limpiar todo
+              </ion-button>
+            </div>
+          </div>
+        </ion-col>
+
+        <!-- CONTROLES -->
+        <ion-col size="12" size-md="6">
+          <div class="card fade-in">
+            <h3 class="card-title">Controles</h3>
+
+            <ion-item class="styled-item">
+              <ion-label>Algoritmo</ion-label>
+              <ion-segment [(ngModel)]="selectedAlgo">
+                <ion-segment-button value="rr">Round Robin</ion-segment-button>
+                <ion-segment-button value="fcfs">FCFS</ion-segment-button>
+              </ion-segment>
+            </ion-item>
+
+            <ion-item class="styled-item" *ngIf="selectedAlgo === 'rr'">
+              <ion-label position="stacked">Quantum</ion-label>
+              <ion-input type="number" [(ngModel)]="quantum"></ion-input>
+            </ion-item>
+
+            <ion-button expand="block" color="primary" (click)="run()" class="btn-animate">
+              Ejecutar
+            </ion-button>
+          </div>
+        </ion-col>
+
+      </ion-row>
+
+      <!-- PROCESOS -->
+      <ion-row *ngIf="processes.length">
+        <ion-col size="12">
+          <div class="card fade-in-up">
+            <h3 class="card-title">Procesos</h3>
+
+            <ion-list>
+              <ion-item *ngFor="let p of processes; let i = index" class="list-animate">
+                <ion-label>
+                  <h3>{{p.id}} — {{p.name}}</h3>
+                  <p>Tiempo: {{p.burst}} | Prioridad: {{p.priority ?? '-'}}</p>
+                </ion-label>
+                <ion-button fill="clear" (click)="editProcess(i)">Editar</ion-button>
+                <ion-button fill="clear" color="danger" (click)="removeProcess(i)">Borrar</ion-button>
+              </ion-item>
+            </ion-list>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <!-- GANTT -->
+      <ion-row *ngIf="result">
+        <ion-col size="12">
+          <div class="card fade-in-up">
+            <h3 class="card-title">Diagrama de Gantt — {{ selectedAlgo === 'rr' ? 'Round Robin' : 'FCFS' }}</h3>
+
+            <div class="gantt glossy">
+              <div class="gantt-inner">
+                <div *ngFor="let seg of result.gantt"
+                  class="gantt-item animate-block color-{{seg.colorIndex}}"
+                  [style.left.px]="seg.start * scale"
+                  [style.width.px]="(seg.end - seg.start) * scale">
+                  {{seg.name}}
+                </div>
+              </div>
+            </div>
+
+            <div class="metrics">
+              <h4 class="card-subtitle">Métricas</h4>
+              <table class="metric-table">
+                <thead><tr><th>Proceso</th><th>Espera</th><th>Retorno</th></tr></thead>
+                <tbody>
+                  <tr *ngFor="let id of waitingIds">
+                    <td>{{id}}</td>
+                    <td>{{result.waitingTimes[id]}}</td>
+                    <td>{{result.turnaroundTimes[id]}}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p class="big-metric">Espera promedio: <strong>{{result.averageWaitingTime | number:'1.2-2'}}</strong></p>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+
+    </ion-grid>
+    
+  </div>
+  <div class="footer-authors fade-in-up">
+    Desarrollado por 
+    <strong>Pedro Pesántez</strong> y <strong>Fernando Martínez</strong>
+  </div>s
+</ion-content>
