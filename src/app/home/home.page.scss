@@ -1,7 +1,7 @@
 :host {
   display: block;
 }
-:host ion-content {
+ion-content {
   --background: #f5f7fa;
 }
 /* ===========================
@@ -53,7 +53,7 @@
   box-shadow: 0 6px 12px rgba(0,0,0,0.12);
 }
 
-:host ion-button {
+ion-button {
   --color: #ffffff !important;
   font-weight: 600;
 }
@@ -66,12 +66,12 @@
   margin-bottom: 10px;
 }
 
-:host ion-label {
+ion-label {
   color: #234048 !important;
   font-weight: 600;
 }
 
-:host ion-input {
+ion-input {
   color: #122329 !important;
 }
 
@@ -169,18 +169,18 @@
 /* ===========================
    FONDO GENERAL DE LA PÁGINA
    =========================== */
-:host ion-content {
+ion-content {
   --background: #f5f7fa;
 }
 /* ===========================
    TOOLBAR
    =========================== */
-:host ion-toolbar {
+ion-toolbar {
   --background: linear-gradient(90deg, #0f4c5c, #0b6b78);
   color: #ffffff !important;
 }
 
-:host ion-title {
+ion-title {
   color: #ffffff !important;
   font-weight: 700;
 }

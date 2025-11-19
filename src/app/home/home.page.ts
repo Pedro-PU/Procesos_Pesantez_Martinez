@@ -17,6 +17,8 @@ export class HomePage {
   newName = '';
   newBurst: number | null = null;
   newPriority: number | null = null;
+  newArrival: number | null = null; // <-- nuevo campo
+
 
   // processes list
   processes: Process[] = [];
@@ -40,6 +42,8 @@ export class HomePage {
   addOrSave() {
     const name = (this.newName || `P${this.processes.length + 1}`).toString();
     const burst = Number(this.newBurst ?? 0);
+    const arrival = Number(this.newArrival ?? 0); // <- obtenemos arrival
+
     if (!burst || burst <= 0) {
       alert('Ingresa un tiempo de ejecución válido (> 0).');
       return;
@@ -47,20 +51,31 @@ export class HomePage {
 
     if (this.editingIndex === null) {
       const id = `P${this.processes.length + 1}`;
-      this.processes.push({ id, name, burst: Math.round(burst), priority: this.newPriority ?? null });
+      this.processes.push({ 
+        id, 
+        name, 
+        burst: Math.round(burst), 
+        arrival: Math.max(0, arrival), // Guardamos arrival
+        priority: this.newPriority ?? null 
+      });
     } else {
       const p = this.processes[this.editingIndex];
       p.name = name;
       p.burst = Math.round(burst);
+      p.arrival = Math.max(0, arrival); // Actualizamos arrival
       p.priority = this.newPriority ?? null;
       this.editingIndex = null;
     }
 
+    // Limpiamos los inputs
     this.newName = '';
     this.newBurst = null;
+    this.newArrival = null; // <-- limpiar campo
     this.newPriority = null;
     this.result = undefined;
   }
+
+
 
   editProcess(i: number) {
     const p = this.processes[i];

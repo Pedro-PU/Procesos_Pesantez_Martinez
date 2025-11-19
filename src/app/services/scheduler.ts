@@ -4,8 +4,10 @@ export interface Process {
   id: string;          // P1, P2...
   name: string;        // Nombre del proceso
   burst: number;       // Tiempo de ejecución
+  arrival?: number;    // Nuevo: instante de llegada
   priority?: number | null;
 }
+
 
 export interface GanttItem {
   id: string;
@@ -41,28 +43,47 @@ export class SchedulerService {
   // --------------------------------------------
   // ROUND ROBIN
   // --------------------------------------------
-  roundRobin(processes: Process[], quantum: number): SchedulerResult {
-
-    const queue = processes.map(p => ({ ...p, remaining: p.burst }));
+  // --------------------------------------------
+// ROUND ROBIN con llegada
+// --------------------------------------------
+roundRobin(processes: Process[], quantum: number): SchedulerResult {
+    // Clonamos los procesos y agregamos remaining
+    const pending = processes.map(p => ({ ...p, remaining: p.burst }));
+    const queue: typeof pending = []; // cola de ejecución
     const gantt: GanttItem[] = [];
     const waiting: { [id: string]: number } = {};
     const turnaround: { [id: string]: number } = {};
 
-    for (const p of queue) waiting[p.id] = 0;
+    // Inicializar tiempos de espera en 0
+    for (const p of pending) waiting[p.id] = 0;
 
     let time = 0;
 
-    while (queue.some(p => p.remaining > 0)) {
+    // Mientras haya procesos pendientes
+    while (pending.some(p => p.remaining > 0) || queue.length > 0) {
+      // Agregar a la cola todos los procesos que ya llegaron y no están en la cola
+      for (let i = 0; i < pending.length; i++) {
+        const p = pending[i];
+        if (p.remaining > 0 && p.arrival! <= time && !queue.includes(p)) {
+          queue.push(p);
+        }
+      }
+
+      if (queue.length === 0) {
+        // No hay procesos listos, avanzar tiempo al siguiente proceso que llegue
+        const nextArrival = Math.min(...pending.filter(p => p.remaining > 0).map(p => p.arrival!));
+        time = nextArrival;
+        continue;
+      }
 
       const p = queue.shift()!;
-      if (p.remaining <= 0) continue;
-
       const exec = Math.min(quantum, p.remaining);
       const start = time;
       time += exec;
       p.remaining -= exec;
       const end = time;
 
+      // Registrar en Gantt
       gantt.push({
         id: p.id,
         name: p.name,
@@ -71,6 +92,7 @@ export class SchedulerService {
         colorIndex: this.hashColor(p.id)
       });
 
+      // Si aún queda tiempo, volver a ponerlo en la cola
       if (p.remaining > 0) {
         queue.push(p);
       } else {
@@ -78,7 +100,7 @@ export class SchedulerService {
         waiting[p.id] = turnaround[p.id] - p.burst;
       }
 
-      // Sumar tiempo de espera a los demás
+      // Sumar tiempo de espera a los demás que ya están en cola
       for (const other of queue) {
         if (other.remaining > 0) {
           waiting[other.id] += exec;
@@ -86,8 +108,7 @@ export class SchedulerService {
       }
     }
 
-    const avg =
-      Object.values(waiting).reduce((a, b) => a + b, 0) / processes.length;
+    const avg = Object.values(waiting).reduce((a, b) => a + b, 0) / processes.length;
 
     return {
       gantt,

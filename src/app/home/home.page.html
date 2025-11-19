@@ -23,6 +23,11 @@
               <ion-input type="number" [(ngModel)]="newPriority"></ion-input>
             </ion-item>
 
+            <ion-item class="styled-item">
+              <ion-label position="stacked">Instante de llegada</ion-label>
+              <ion-input type="number" [(ngModel)]="newArrival"></ion-input>
+            </ion-item>
+
             <div class="button-row">
               <ion-button expand="block" color="success" (click)="addOrSave()" class="btn-animate">
                 {{ editingIndex === null ? 'Agregar' : 'Guardar' }}
@@ -71,7 +76,12 @@
               <ion-item *ngFor="let p of processes; let i = index" class="list-animate">
                 <ion-label>
                   <h3>{{p.id}} — {{p.name}}</h3>
-                  <p>Tiempo: {{p.burst}} | Prioridad: {{p.priority ?? '-'}}</p>
+                  <p>
+                    Tiempo: {{p.burst}} | 
+                    Prioridad: {{p.priority ?? '-' }} | 
+                    Llegada: {{p.arrival ?? 0}}
+                  </p>
+
                 </ion-label>
                 <ion-button fill="clear" (click)="editProcess(i)">Editar</ion-button>
                 <ion-button fill="clear" color="danger" (click)="removeProcess(i)">Borrar</ion-button>
@@ -123,5 +133,5 @@
   <div class="footer-authors fade-in-up">
     Desarrollado por 
     <strong>Pedro Pesántez</strong> y <strong>Fernando Martínez</strong>
-  </div>s
+  </div>
 </ion-content>
